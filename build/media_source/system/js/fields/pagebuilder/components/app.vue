@@ -157,7 +157,6 @@
          const queryString = Object.keys(dataConf).reduce((a, k) => { a.push(`${k}=${encodeURIComponent(dataConf[k])}`); return a; }, []).join('&');
          const url = `${document.location.href}&${queryString}`;
 		axios.get(url).then((res) => {
-			console.warn(res)
 			this.renderPreview = res.data.data;
 		})
 	 }
