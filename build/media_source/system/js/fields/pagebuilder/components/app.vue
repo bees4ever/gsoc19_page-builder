@@ -55,14 +55,24 @@
 			<!-- Modals -->
 			<add-element-modal id="add-element"></add-element-modal>
 		</div>
+		<div class="col col-4">
+			<h2>Preview</h2>
+			<div v-html="renderPreview"></div>
+		</div>
 	</div>
 </template>
 
 <script>
   import {mapMutations, mapState} from 'vuex';
   import draggable from 'vuedraggable';
+  import axios from "axios";
 
   export default {
+	  data() {
+		  return {
+		      renderPreview: ""
+          }
+	  },
     computed: {
       ...mapState([
         'activeDevice',
@@ -97,6 +107,7 @@
       elementArray: {
         handler(newVal) {
           document.getElementById('jform_params_grid').value = JSON.stringify(newVal);
+          this.liveViewPost(JSON.stringify(newVal));
         },
         deep: true,
       },
@@ -134,6 +145,12 @@
       drag(event) {
         event.dataTransfer.setData('text', event.target.id);
       },
+	 liveViewPost(data){
+         axios.post(document.location.href,{action: 'pagebuilder_liveview', data: data}).then((data) => {
+             console.warn(data)
+			 this.renderPreview = data.data.preview;
+         })
+	 }
     },
     components: {
       draggable
