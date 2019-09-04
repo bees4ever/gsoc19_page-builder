@@ -33,6 +33,10 @@
 					</li>
 				</ul>
 			</div>
+			<div class="col col-12" style="height: 100px">
+				<h2>{{ translate('JLIB_PAGEBUILDER_PREVIEW') }}</h2>
+				<div v-html="renderPreview"></div>
+			</div>
 		</div>
 
 		<div class="pagebuilder" id="pagebuilder" :style="widthStyle">
@@ -55,10 +59,7 @@
 			<!-- Modals -->
 			<add-element-modal id="add-element"></add-element-modal>
 		</div>
-		<div class="col col-4">
-			<h2>Preview</h2>
-			<div v-html="renderPreview"></div>
-		</div>
+
 	</div>
 </template>
 
@@ -125,6 +126,7 @@
         let element = document.getElementsByClassName('drag_message')[0];
         element.appendChild(document.getElementById('drag_message'));
       }
+      this.liveViewPost(JSON.stringify(this.elementArray));
     },
     methods: {
       ...mapMutations([
@@ -146,10 +148,18 @@
         event.dataTransfer.setData('text', event.target.id);
       },
 	 liveViewPost(data){
-         axios.post(document.location.href,{action: 'pagebuilder_liveview', data: data}).then((data) => {
-             console.warn(data)
-			 this.renderPreview = data.data.preview;
-         })
+         let dataConf = {
+             task: 'ajax.fetchAssociations',
+             format: 'json',
+             data: window.btoa(data),
+			 action: 'pagebuilder_liveview'
+         };
+         const queryString = Object.keys(dataConf).reduce((a, k) => { a.push(`${k}=${encodeURIComponent(dataConf[k])}`); return a; }, []).join('&');
+         const url = `${document.location.href}&${queryString}`;
+		axios.get(url).then((res) => {
+			console.warn(res)
+			this.renderPreview = res.data.data;
+		})
 	 }
     },
     components: {

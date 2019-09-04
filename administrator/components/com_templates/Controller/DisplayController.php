@@ -14,7 +14,6 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
-use Joomla\Component\Templates\Administrator\Helper\RenderHelper;
 
 /**
  * Templates manager master display controller.
@@ -29,24 +28,6 @@ class DisplayController extends BaseController
 	 */
 	protected $default_view = 'styles';
 
-	private function handlePost(){
-        $entityBody = file_get_contents('php://input');
-        if(strlen($entityBody) == 0) return;
-
-        $postData = json_decode($entityBody);
-
-        switch($postData->action) {
-            case "pagebuilder_liveview":
-                error_log($postData->data);
-                $view = RenderHelper::renderElements($postData->data); // layout JSON
-                echo json_encode(["action" => $postData->action, "preview" => $view]);
-                break;
-        }
-
-        die();
-
-	}
-
 	/**
 	 * Method to display a view.
 	 *
@@ -59,8 +40,6 @@ class DisplayController extends BaseController
 	 */
 	public function display($cachable = false, $urlparams = false)
 	{
-        self::handlePost();
-
 		$view   = $this->input->get('view', 'styles');
 		$layout = $this->input->get('layout', 'default');
 		$id     = $this->input->getInt('id');
