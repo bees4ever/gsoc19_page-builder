@@ -26,15 +26,22 @@ class PlgPagebuilderModuleposition extends CMSPlugin
 	 */
 	protected $autoloadLanguage = true;
 
-	private function loadValidModuleNames(){
+	private function loadValidModulePositions(){
         $db = JFactory::getDbo();
         $query = $db->getQuery(true)
-            ->select([$db->quoteName('module')]) #
+            ->select([$db->quoteName('position')]) #
             ->from($db->quoteName('#__modules'))
-            ->where($db->quoteName('published') . ' = 1');
+            ->where($db->quoteName('published') . ' = 1')
+            ->order('position asc');
 
         $modelresults = $db->setQuery($query)->loadObjectList();
-        return array_map(function($mod){ return $mod->module; }, $modelresults);
+        $positions = [];
+        foreach($modelresults as $res){
+            $res = $res->position;
+            if ($res == NULL) $res = "NONE";
+            $positions[$res] = $res;
+        }
+        return $positions;
     }
 
 	/**
@@ -70,7 +77,7 @@ class PlgPagebuilderModuleposition extends CMSPlugin
 			'message'     => false,
 			'config'  => array(
 				'position_name' => array(
-					'value' => $this->loadValidModuleNames(),
+					'value' => $this->loadValidModulePositions(),
 					'type' => 'select',
 					'required' => true,
 					'show' => true,
