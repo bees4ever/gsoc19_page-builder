@@ -60,7 +60,7 @@
 					</div>
 				</div>
 			</div>
-			<small class="form-text text-muted">{{ translate('JLIB_PAGEBUILDER_ADD_ELEMENT_DESC') }}</small>
+			<small class="form-text text-muted add_element_desc">{{ translate('JLIB_PAGEBUILDER_ADD_ELEMENT_DESC') }}</small>
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-secondary" @click="$modal.hide('add-element')">
@@ -170,3 +170,13 @@
     },
   };
 </script>
+
+<style lang="scss">
+
+	.add_element_desc {
+		margin-top: 12.5px;
+		margin-left: 1.5px;
+	}
+
+</style>
+
