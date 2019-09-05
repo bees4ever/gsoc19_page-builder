@@ -4,11 +4,7 @@
 			<div class="sidebar-content">
 				<h2>{{ translate('JLIB_PAGEBUILDER_SETTINGS') }}
 
-					<!--	<button type="button" class="close testButton" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>-->
-
-					<button type="button" class="btn btn-lg closeButton" @click="closeNav()">
+					<button type="button" class="btn btn-lg closeButton" @click="closeNav()" aria-label="Close">
 						<span class="icon-cancel"></span>
 					</button>
 				</h2>
@@ -162,5 +158,10 @@
 
 	.sidebar .closeButton {
 		float: right;
+	}
+
+	.sidebar .sidebar-content {
+		margin-left: 15px;
+		margin-top: 12.5px
 	}
 </style>
