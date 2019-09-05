@@ -15,8 +15,8 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Device</th>
-                                <th scope="col">Offset</th>
+								<th scope="col"><label>{{ translate('JLIB_PAGEBUILDER_DEVICE') }}</label></th>
+                                <th scope="col">{{ translate('JLIB_PAGEBUILDER_OFFSET') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,7 +43,7 @@
                             :required="config.required" v-model="elementSelected.options[id]" />
 			    </div>
 			</div>
-            
+
             <div>
                 <button type="button" class="btn btn-success" @click="add">{{ translate('JLIB_PAGEBUILDER_ADD') }}</button>
                 <button type="button" class="btn btn-secondary" @click="closeNav">{{ translate('JTOOLBAR_CLOSE') }}</button>

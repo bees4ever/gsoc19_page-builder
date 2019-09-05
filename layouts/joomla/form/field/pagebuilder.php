@@ -98,6 +98,7 @@ Text::script('JLIB_PAGEBUILDER_VIEW', true);
 Text::script('JSEARCH_RESET', true);
 Text::script('JTOOLBAR_BACK', true);
 Text::script('JTOOLBAR_CLOSE', true);
+Text::script('JLIB_PAGEBUILDER_DEVICE', true);
 ?>
 
 <input type="text" id="<?php echo $id ?>" name="<?php echo $name ?>" class="hidden" value="<?php echo $value ?>">
