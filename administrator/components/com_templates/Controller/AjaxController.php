@@ -11,6 +11,7 @@ namespace Joomla\Component\Templates\Administrator\Controller;
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Associations;
 use Joomla\CMS\Language\LanguageHelper;
 use Joomla\CMS\Language\Text;
@@ -19,6 +20,7 @@ use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Table\Table;
 use Joomla\Component\Templates\Administrator\Helper\RenderHelper;
+use Joomla\CMS\Document\HtmlDocument;
 
 /**
  * The menu controller for ajax requests
@@ -27,26 +29,37 @@ use Joomla\Component\Templates\Administrator\Helper\RenderHelper;
  */
 class AjaxController extends BaseController
 {
-    /**
-     * Method to fetch associations of a menu item
-     *
-     * The method assumes that the following http parameters are passed in an Ajax Get request:
-     * token: the form token
-     * assocId: the id of the menu item whose associations are to be returned
-     * excludeLang: the association for this language is to be excluded
-     *
-     * @return  null
-     *
-     * @since  3.9.0
-     */
+	/**
+	 * Method to fetch associations
+	 *
+	 * The method assumes that the following http parameters are passed in an Ajax Get request:
+	 * handles request for the page builder
+	 *
+	 * @return string JSON answer
+	 * @author Allan Karlson
+	 * @since  3.9.0
+	 */
 
-    public function fetchAssociations()
-    {
-        switch($this->input->get("action")) {
-            case "pagebuilder_liveview":
-                $view = RenderHelper::renderElements(base64_decode($this->input->get("data"))); // layout JSON is encoded
-                echo new JsonResponse($view, "pagebuilder preview rendering");
-                break;
-        }
-    }
+	public function fetchAssociations()
+	{
+		switch ($this->input->get("action"))
+		{
+			case "pagebuilder_liveview":
+				$jsonLayout = base64_decode($this->input->get("data"));
+				//$view = RenderHelper::renderElements($jsonLayout); // layout JSON is encoded
+
+				// Apodis index.php need a "grid" parameter which I encoded because of "parameter sanitizing",
+				// therefore set it again to the $_GET parameter now
+				$_GET['grid'] = $jsonLayout;
+
+				$config = Factory::getConfig();
+
+				$fulltempPath = $config->get('tmp_path') . "/../templates/";
+
+				$htmlDoc = new HtmlDocument();
+				$outrender = $htmlDoc->render(false, ["directory" => $fulltempPath, "template" => "apodis", "file" => "index.php"]);
+				echo new JsonResponse($outrender, "pagebuilder preview rendering");
+				break;
+		}
+	}
 }
