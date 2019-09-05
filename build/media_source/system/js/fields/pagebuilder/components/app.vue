@@ -35,7 +35,7 @@
 			</div>
 			<div class="col col-12" style="height: 100px">
 				<h2>{{ translate('JLIB_PAGEBUILDER_PREVIEW') }}</h2>
-				<div v-html="renderPreview"></div>
+				<div v-html="renderPreview" :style="previewStyle"></div>
 			</div>
 		</div>
 
@@ -79,7 +79,21 @@
         'activeDevice',
         'resolution',
         'selectedSettings',
+        'advancedSettings'
       ]),
+        previewStyle() {
+            this.loadAdvancedSettings()
+            let height = 30;
+
+            this.getChildrenSizeOfPageContent(this.elementArray)
+
+
+            return {
+                'height': `${height}px`,
+                'background-color': `${this.advancedSettings.bgColor}`,
+                'color': `${this.advancedSettings.baseColor}`,
+            }
+        },
       widthStyle() {
         const deviceOrder = Object.keys(this.resolution);
         const activeIndex = deviceOrder.indexOf(this.activeDevice);
@@ -118,6 +132,7 @@
       this.checkAllowedElements();
     },
     mounted() {
+        this.loadAdvancedSettings();
       if(document.getElementsByClassName('drag_component').length) {
         let element = document.getElementsByClassName('drag_component')[0];
         element.appendChild(document.getElementById('drag_component'));
@@ -138,7 +153,8 @@
         'updateElementArray',
         'editElement',
         'updateGrid',
-        'restorePosition'
+        'restorePosition',
+        'setAdvancedSettings'
       ]),
       addElement() {
         this.setParent(this.elementArray);
@@ -147,11 +163,24 @@
       drag(event) {
         event.dataTransfer.setData('text', event.target.id);
       },
+        getChildrenSizeOfPageContent(rootPoint){
+
+        },
+        loadAdvancedSettings() {
+            this.setAdvancedSettings({
+                bgColor: document.getElementById('jform_params_baseBG').value,
+                baseColor: document.getElementById('jform_params_baseColor').value,
+                linkColor: document.getElementById('jform_params_linkColor').value
+            })
+        },
 	 liveViewPost(data){
          let dataConf = {
              task: 'ajax.fetchAssociations',
              format: 'json',
              data: window.btoa(data),
+             baseBG: `${this.advancedSettings.bgColor}`,
+             baseColor: `${this.advancedSettings.baseColor}`,
+             linkColor: `${this.advancedSettings.linkColor}`,
 			 action: 'pagebuilder_liveview'
          };
          const queryString = Object.keys(dataConf).reduce((a, k) => { a.push(`${k}=${encodeURIComponent(dataConf[k])}`); return a; }, []).join('&');
@@ -166,3 +195,16 @@
     }
   };
 </script>
+
+<style lang="scss">
+    #renderPreview {
+        height: 100px;
+
+        div {
+            height: 50px;
+            border: solid 1px black;
+
+        }
+    }
+
+</style>
