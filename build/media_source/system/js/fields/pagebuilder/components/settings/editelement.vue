@@ -20,14 +20,14 @@
 					<table class="table">
 						<thead>
 						<tr>
-							<th scope="col"><label>{{ translate('JLIB_PAGEBUILDER_DEVICE') }}</label></th>
+							<th scope="col">{{ translate('JLIB_PAGEBUILDER_DEVICE') }}</th>
 							<th scope="col">{{ translate('JLIB_PAGEBUILDER_OFFSET') }}</th>
 						</tr>
 						</thead>
 						<tbody>
 						<tr v-for="size in offset_sizes">
 							<th scope="row"><i :class="['fas', 'fa-' + size.icon, 'fa-lg', 'fa-rotate-' + size.rotate]"
-											   class="testclass"></i></th>
+											   class="icons_pictures"></i></th>
 							<td class="control-group">
 								<select name="element_offset" id="element_offset" class="custom-select custom-select-sm"
 										v-model="element_offset[size.label]">
@@ -201,8 +201,12 @@
 
 <style lang="scss">
 
-	.testclass {
-		padding-top: 15px;
+	.fa-rotate-270 {
+		margin-top: 0px;
+	}
+
+	.icons_pictures {
+		margin-top: 15px;
 	}
 
 	.buttonsOnBottom {

@@ -34,8 +34,8 @@
 
 			<div v-else>
 				<item v-for="child in element.children" :key="child.key" :item="child"
-						@delete="deleteElement({element: child, parent: item})"
-						@edit="editElement({element: child, parent: item})">
+					  @delete="deleteElement({element: child, parent: item})"
+					  @edit="editElement({element: child, parent: item})">
 				</item>
 			</div>
 		</div>
@@ -43,94 +43,96 @@
 </template>
 
 <script>
-  import {mapGetters, mapMutations, mapState} from 'vuex';
+    import {mapGetters, mapMutations, mapState} from 'vuex';
 
-  export default {
-    name: 'item',
-    props: {
-      item: {
-        required: true,
-        type: Object,
-      },
-      handleRequired: {
-        type: Boolean
-      }
-    },
-    computed: {
-      ...mapState([
-        'childAllowed',
-        'componentAllowed',
-        'messageAllowed'
-      ]),
-      ...mapGetters([
-        'getType'
-      ]),
-      classes() {
-        return [
-          'item',
-          `pagebuilder_${this.element.type} ${this.element.options.class}`,
-          this.element.options.component ? 'drag_component' : '',
-          this.element.options.message ? 'drag_message' : ''];
-      },
-      showDetails() {
-        const type = this.getType(this.item);
-
-        if (type && type.config) {
-          const show = [];
-          for (const key in type.config) {
-            if (type.config.hasOwnProperty(key) && type.config[key].show) {
-              show.push({label: type.config[key].label, value: (this.item.options[key] || this.item[key])});
+    export default {
+        name: 'item',
+        props: {
+            item: {
+                required: true,
+                type: Object,
+            },
+            handleRequired: {
+                type: Boolean
             }
-          }
+        },
+        computed: {
+            ...mapState([
+                'childAllowed',
+                'componentAllowed',
+                'messageAllowed'
+            ]),
+            ...mapGetters([
+                'getType'
+            ]),
+            classes() {
+                return [
+                    'item',
+                    `pagebuilder_${this.element.type} ${this.element.options.class}`,
+                    this.element.options.component ? 'drag_component' : '',
+                    this.element.options.message ? 'drag_message' : ''];
+            },
+            showDetails() {
+                const type = this.getType(this.item);
 
-          return show;
-        }
+                if (type && type.config) {
+                    const show = [];
+                    for (const key in type.config) {
+                        if (type.config.hasOwnProperty(key) && type.config[key].show) {
+                            show.push({
+                                label: type.config[key].label,
+                                value: (this.item.options[key] || this.item[key])
+                            });
+                        }
+                    }
 
-        return [];
-      }
-    },
-    data() {
-      return {
-        element: this.item
-      };
-    },
-    methods: {
-      ...mapMutations([
-        'addElement',
-        'editElement',
-        'deleteElement',
-        'fillAllowedChildren',
-        'setParent',
-        'updateGrid'
-      ]),
-      add(parent) {
-        this.setParent(parent);
+                    return show;
+                }
 
-        if (parent.type === 'grid') {
-          this.addElement({
-            name: 'column',
-            config: ''
-          });
-        } else {
-          this.$modal.show('add-element');
-        }
-      },
-      drop(event) {
-        let classArray = Object.values(event.target.classList);
-        if (classArray.includes('drag_component') || classArray.includes('drag_message') || classArray.includes('col-offset')) {
-          return;
-        }
-        let data = event.dataTransfer.getData('text').split('_')[1];
-        if (this.componentAllowed.includes(event.target.__vue__.item.type)) {
-          event.target.__vue__.item.options[data] = true;
-        }
-        else {
-          return;
-        }
-        event.target.appendChild(document.getElementById('drag_' + data));
-        event.target.classList.add('drag_' + data);
-        this.updateGrid();
-      },
-    },
-  };
+                return [];
+            }
+        },
+        data() {
+            return {
+                element: this.item
+            };
+        },
+        methods: {
+            ...mapMutations([
+                'addElement',
+                'editElement',
+                'deleteElement',
+                'fillAllowedChildren',
+                'setParent',
+                'updateGrid'
+            ]),
+            add(parent) {
+                this.setParent(parent);
+                if (parent.type === 'grid') {
+                    this.addElement({
+                        name: 'column',
+                        config: '',
+                        styles: "test"
+                    });
+                } else {
+                    this.$modal.show('add-element');
+                }
+            },
+            drop(event) {
+                let classArray = Object.values(event.target.classList);
+                if (classArray.includes('drag_component') || classArray.includes('drag_message') || classArray.includes('col-offset')) {
+                    return;
+                }
+                let data = event.dataTransfer.getData('text').split('_')[1];
+                if (this.componentAllowed.includes(event.target.__vue__.item.type)) {
+                    event.target.__vue__.item.options[data] = true;
+                } else {
+                    return;
+                }
+                event.target.appendChild(document.getElementById('drag_' + data));
+                event.target.classList.add('drag_' + data);
+                this.updateGrid();
+            },
+        },
+    };
 </script>
