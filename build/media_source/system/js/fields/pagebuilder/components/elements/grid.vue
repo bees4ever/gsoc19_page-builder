@@ -393,10 +393,6 @@
           }
           this.updateCircles = 2
 		} else {
-          console.log("circle 2")
-          this.columns.forEach(col => {
-            console.log(col)
-		  });
           this.initOffsets(true);
           this.updateCircles = 1
 		}
