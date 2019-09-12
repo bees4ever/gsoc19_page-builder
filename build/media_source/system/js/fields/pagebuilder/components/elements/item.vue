@@ -28,6 +28,7 @@
 				<div v-for="detail in showDetails" v-if="detail.value">
 					<span>{{ detail.label }} - {{ detail.value }}</span>
 				</div>
+				{{element.key}}
 			</div>
 
 			<grid v-if="element.type === 'grid'" :grid="element"></grid>

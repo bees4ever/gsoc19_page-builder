@@ -9,6 +9,7 @@
 		@layout-updated="updateLayout"
 	>
 
+
 		<!-- Columns -->
 		<grid-item
 			v-for="column in columns"
@@ -78,8 +79,21 @@
       ...mapGetters([
         'getElementSize'
       ]),
+	  allAtPos(){
+        let res = {}
+		for(let i=0; i<this.size;i++){
+          for(let j=0; j<this.size;j++){
+			res[`${i}x${j}`] = this.atPosition(i,j)
+          }
+		}
+		return res
+	  },
       allColumns() {
-        return this.columns.concat(this.offsets).concat(this.rowPlaceholder);
+
+		let cols = this.columns.concat(this.offsets).concat(this.rowPlaceholder);
+        console.log(cols)
+
+        return cols;
       },
       nextIndex() {
         let index = 0;
@@ -146,9 +160,17 @@
           this.updateLayout();
         }
       },
+      columns(payload){
+        console.log("payload")
+        payload.forEach(col => {
+          console.log(` --> (${col.x}, ${col.y}, ${col.w})`)
+		})
+        this.initOffsets(true);
+	  }
     },
     created() {
       this.mapGrid();
+      this.initOffsets(false);
       this.initOffsets(true);
     },
     methods: {
@@ -226,11 +248,12 @@
       initOffsets(create) {
         this.columns.forEach(col => {
           if (col.element.options.offset[this.activeDevice]) {
-            if (create) {
-              this.createOffset(col);
+            this.createOffset(col);
+            /*if (create) {
+
 			} else {
               this.addAOffset(col)
-			}
+			}*/
           }
         });
       },
@@ -244,16 +267,89 @@
       },
 	  addAOffset(column){
         const offset = column.element.options.offset[this.activeDevice];
+        console.log(`For key=${column.element.key} offset ${offset} we add to x = ${column.x}`)
         column.x += offset
 
         if(column.x < offset) { // if offset run over left border push it back
           column.x = offset;
         }
+
+
+	  },
+
+	  ownMoveToRight(col, space){
+        let _self = this;
+
+          console.log("tets", _self.size)
+          col.x += space
+          console.log(col.x, space)
+		  if (col.x + space > _self.size) {
+
+		    console.log(col.y)
+            col.x = space
+			console.warn(col.y)
+			col.y = 1 + col.y
+            console.warn(col.y)
+			// If something grids are before the moved gird, move his gird to right
+
+
+            _self.ownMoveToRight(col, space)
+			/*let yRow = col.y
+            let xCol = col.x
+            let coordinates = _self.atPosition(xCol, yRow)
+			while(coordinates){
+		      //if (coordinates.element.key !== col.element.key) {
+                console.log("coordinates", coordinates )
+                col.x ++
+			    xCol ++;
+                coordinates = _self.atPosition(xCol, yRow)
+			  //}
+
+
+			}*/
+		  }
+
+
 	  },
       createOffset(column) {
-        const offset = column.element.options.offset[this.activeDevice];
-		if(this.updateCircles === 1) this.moveToRight(column.x, column.y, offset);
 
+		this.columns.forEach(col => {
+		  console.log(`(${col.x}, ${col.y}, ${col.w})`)
+		})
+
+
+
+        const offset = column.element.options.offset[this.activeDevice];
+		console.log(`org column: ${column.element.key}`)
+		let _self = this;
+        setTimeout(function () {
+          _self.ownMoveToRight(column, offset);
+
+          for (let ypos = 0; ypos <= _self.maxRow; ypos++) {
+            for (let xpos = 0; xpos <= _self.size; xpos++) {
+              let elem = _self.atPosition(xpos, ypos, true)
+              if (elem.length >= 2) {
+                elem.forEach(e => {
+                  if (e.element.key !== column.element.key) { // orginal element
+                    _self.moveToLeft(e.x, e.y, e.w)
+                  }
+				})
+
+			  }
+			  console.log("key len", elem.length)
+
+            }
+          }
+
+          _self.columns.forEach(col => {
+            console.log(` ### (${col.x}, ${col.y}, ${col.w})`)
+          })
+        }, 300);
+
+
+        return
+
+		 this.moveToRight(column.x, column.y, offset);
         // Be sure that there is space for offset
         if (column.x === 0) {
           this.moveToRight(column.x, column.y, offset);
@@ -261,8 +357,9 @@
             column.x = offset;
 		}
 
+
         const offsetObj = {
-          i: `offset-${column.element.key}`,
+          i: `offset-${column.element.key} ${Math.random()}`,
           x: column.x - offset,
           y: column.y,
           w: offset,
@@ -360,13 +457,24 @@
           col.x -= w || 1;
         }
       },
-      atPosition(x, y) {
-        return this.columns.find(col => {
-		  // new
-		  const beforeX = (col.offset) ? (x <= col.x && x >= col.x - col.offset.w + 1) : false;
+
+      atPosition(x, y, multi) {
+        const findMulti = (typeof multi === 'undefined') ? false : multi;
+
+        const filter = function (col) {
+          // new
+          //const beforeX = (col.offset) ? (x <= col.x && x >= col.x - col.offset.w + 1) : false;
+          const beforeX = false;
           const inRow = y === col.y || (y >= col.y && y <= col.y + col.h - 1);
           return inRow && (x === col.x || (x >= col.x && x <= col.x + col.w - 1) || beforeX);
-        });
+        };
+
+
+        if (findMulti) {
+          return this.columns.filter(filter);
+		} else {
+          return this.columns.find(filter);
+		}
       },
       changeSize(i, newH, newW) {
         const col = this.getColumnByIndex(i);
@@ -377,11 +485,14 @@
         this.moved = true;
       },
       updateLayout() {
-        if(this.updateCircles == 1) {
+        //if(this.updateCircles === 1) {
           this.resetOffsets();
+
           this.resetHeight();
-          this.positioning();
-          this.initOffsets(false);
+
+        this.positioning();
+
+          //this.initOffsets(false);
           this.setHeight();
           this.setResizeListeners();
 
@@ -391,11 +502,11 @@
             this.updateChildrenOrder({parent: this.grid, children: colElements});
             this.moved = false;
           }
-          this.updateCircles = 2
-		} else {
-          this.initOffsets(true);
+          //this.updateCircles = 2
+        // } else {
+          //this.initOffsets(true);
           this.updateCircles = 1
-		}
+        // }
       },
       positioning() {
         // Bring columns in correct order to fill gaps one after another
@@ -427,7 +538,6 @@
           if (stop) {
             break;
           }
-
           // First x is not higher than column.x, in other rows the x just gives enough width
           const maxX = y === colY ? colX - 1 : this.size - colW;
           for (let x = maxX; x >= 0; x -= 1) {
