@@ -330,8 +330,11 @@
               let elem = _self.atPosition(xpos, ypos, true)
               if (elem.length >= 2) {
                 elem.forEach(e => {
-                  if (e.element.key !== column.element.key) { // orginal element
-                    _self.moveToLeft(e.x, e.y, e.w)
+                  if (e.element.key !== column.element.key) { // original element
+
+                    // calc the diff
+					console.log("MOVET TO RIGHT: ", e.element.key)
+                    _self.moveToRight(column.x+column.w, e.y, e.w)
                   }
 				})
 
@@ -430,8 +433,14 @@
           this.moveToLeft(resizedCol.x + resizedCol.w, resizedCol.y);
         }
       },
-      moveToRight(x, y, w) {
-        const col = this.atPosition(x, y);
+      moveToRight(x, y, w, costum_col) {
+        let col = null;
+        if (typeof costum_col === 'undefined') {
+          col = this.atPosition(x, y);
+		} else {
+		  col = costum_col;
+		}
+
         if (!col) {
           return;
         }
